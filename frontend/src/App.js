@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
 import ProfilePanel from './components/Settings';
 import './App.css';
+import InstallButton from './components/InstallButton';
 
 const ChatApp = () => {
   const [showProfile, setShowProfile] = useState(false);
@@ -19,6 +20,7 @@ const ChatApp = () => {
       />
       <ChatWindow />
       {showProfile && <ProfilePanel onClose={() => setShowProfile(false)} />}
+     <InstallButton />
     </div>
   );
 };
