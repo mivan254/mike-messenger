@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIKE Messenger - Download</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #111b21;
+      color: #e9edef;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 600px;
+    }
+    .logo { font-size: 80px; margin-bottom: 20px; }
+    h1 {
+      font-size: 42px;
+      color: #00a884;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      font-size: 18px;
+      color: #8696a0;
+      margin-bottom: 40px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .feature {
+      background: #202c33;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 8px; }
+    .feature h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .feature p { font-size: 12px; color: #8696a0; }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-primary {
+      background: #00a884;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+      width: 100%;
+      max-width: 320px;
+    }
+    .btn-primary:hover { background: #008069; }
+    .btn-secondary {
+      background: #202c33;
+      color: #00a884;
+      border: 2px solid #00a884;
+      border-radius: 50px;
+      padding: 14px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      max-width: 320px;
+    }
+    .install-steps {
+      background: #202c33;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      text-align: left;
+    }
+    .install-steps h3 {
+      color: #00a884;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: #8696a0;
+      border-bottom: 1px solid #2a3942;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      background: #00a884;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .url-box {
+      background: #2a3942;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #00a884;
+      margin-top: 16px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🔥</div>
+    <h1>MIKE Messenger</h1>
+    <p class="tagline">Real-time messaging for everyone. Free. Fast. Secure.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>Real-time Chat</h3>
+        <p>Instant messaging with live delivery status</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">👥</div>
+        <h3>Group Chats</h3>
+        <p>Create groups and chat with multiple people</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📎</div>
+        <h3>File Sharing</h3>
+        <p>Share images, videos, audio and files</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure</h3>
+        <p>Encrypted messages and chat lock vault</p>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <a href="https://mike-messenger.vercel.app" class="btn-primary" target="_blank">
+        🚀 Open MIKE Messenger
+      </a>
+      <a href="https://mike-messenger.vercel.app" class="btn-secondary" target="_blank">
+        📲 Install as App
+      </a>
+    </div>
+
+    <div class="install-steps">
+      <h3>📲 How to Install on your device</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <span>Open the link below in <strong>Chrome browser</strong></span>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <span>Click the <strong>3 dots menu (⋮)</strong> in top right</span>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <span>Click <strong>"Install App"</strong> or <strong>"Add to Home screen"</strong></span>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <span>Click <strong>Install</strong> — done! 🎉</span>
+      </div>
+      <div class="url-box">
+        🌐 mike-messenger.vercel.app
+      </div>
+    </div>
+  </div>
+</body>
+</html>
