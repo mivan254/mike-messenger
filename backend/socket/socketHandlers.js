@@ -1,45 +1,35 @@
 const Message = require('../models/Message');
 const Chat = require('../models/Chat');
 const User = require('../models/User');
+const Call = require('../models/Call');
 const { verifySocketToken } = require('../middleware/auth');
 
-// Map: userId -> Set of socketIds (user may have multiple tabs)
 const onlineUsers = new Map();
 
 const setupSocket = (io) => {
-  // Auth middleware for socket
   io.use((socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.query.token;
     if (!token) return next(new Error('Authentication error'));
-
     const decoded = verifySocketToken(token);
     if (!decoded) return next(new Error('Invalid token'));
-
     socket.userId = decoded.id;
     next();
   });
 
   io.on('connection', async (socket) => {
     const userId = socket.userId;
-    console.log(`🟢 User connected: ${userId} (socket: ${socket.id})`);
+    console.log(`🟢 User connected: ${userId}`);
 
-    // Track online users
     if (!onlineUsers.has(userId)) onlineUsers.set(userId, new Set());
     onlineUsers.get(userId).add(socket.id);
 
-    // Update user online status and socketId in DB
     await User.findByIdAndUpdate(userId, { isOnline: true, socketId: socket.id });
-
-    // Broadcast online status to contacts
     socket.broadcast.emit('user_status_change', { userId, isOnline: true });
 
-    // Join all user's chat rooms
     const userChats = await Chat.find({ 'participants.user': userId }).select('_id');
     userChats.forEach((chat) => socket.join(`chat:${chat._id}`));
 
-    // ─────────────────────────────────────────
-    // SEND MESSAGE
-    // ─────────────────────────────────────────
+    // ─── MESSAGING ───────────────────────────
     socket.on('send_message', async (data, callback) => {
       try {
         const { chatId, content, type = 'text', replyTo, mediaUrl, mediaFilename, mediaMimetype, mediaSize, isViewOnce } = data;
@@ -50,7 +40,6 @@ const setupSocket = (io) => {
         const isMember = chat.participants.some((p) => p.user.toString() === userId);
         if (!isMember) return callback?.({ error: 'Not a member' });
 
-        // Build message
         const messageData = {
           chat: chatId,
           sender: userId,
@@ -69,25 +58,15 @@ const setupSocket = (io) => {
         await message.populate('sender', 'username displayName avatar');
         if (message.replyTo) await message.populate('replyTo', 'content sender type');
 
-        // Update chat lastMessage and lastActivity
         await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id, lastActivity: new Date() });
 
-        // Emit to all participants in room
-        io.to(`chat:${chatId}`).emit('receive_message', {
-          message,
-          chatId,
-        });
-
+        io.to(`chat:${chatId}`).emit('receive_message', { message, chatId });
         callback?.({ success: true, message });
       } catch (error) {
-        console.error('send_message error:', error);
         callback?.({ error: error.message });
       }
     });
 
-    // ─────────────────────────────────────────
-    // TYPING INDICATORS
-    // ─────────────────────────────────────────
     socket.on('typing_start', ({ chatId }) => {
       socket.to(`chat:${chatId}`).emit('typing_indicator', { userId, chatId, isTyping: true });
     });
@@ -96,65 +75,30 @@ const setupSocket = (io) => {
       socket.to(`chat:${chatId}`).emit('typing_indicator', { userId, chatId, isTyping: false });
     });
 
-    // ─────────────────────────────────────────
-    // MESSAGE SEEN
-    // ─────────────────────────────────────────
     socket.on('message_seen', async ({ messageId, chatId }) => {
       try {
         const message = await Message.findById(messageId);
         if (!message) return;
-
         const alreadySeen = message.seenBy.some((s) => s.user.toString() === userId);
         if (!alreadySeen) {
           message.seenBy.push({ user: userId });
           await message.save();
         }
-
-        // Notify sender
-        io.to(`chat:${chatId}`).emit('message_seen_update', {
-          messageId,
-          seenBy: userId,
-          chatId,
-        });
+        io.to(`chat:${chatId}`).emit('message_seen_update', { messageId, seenBy: userId, chatId });
       } catch (error) {
         console.error('message_seen error:', error);
       }
     });
 
-    // ─────────────────────────────────────────
-    // MESSAGE DELIVERED
-    // ─────────────────────────────────────────
-    socket.on('message_delivered', async ({ messageId, chatId }) => {
-      try {
-        const message = await Message.findById(messageId);
-        if (!message) return;
-
-        const alreadyDelivered = message.deliveredTo.some((d) => d.user.toString() === userId);
-        if (!alreadyDelivered) {
-          message.deliveredTo.push({ user: userId });
-          await message.save();
-        }
-
-        io.to(`chat:${chatId}`).emit('message_delivered_update', { messageId, deliveredTo: userId });
-      } catch (error) {
-        console.error('message_delivered error:', error);
-      }
-    });
-
-    // ─────────────────────────────────────────
-    // EDIT MESSAGE
-    // ─────────────────────────────────────────
     socket.on('edit_message', async ({ messageId, content, chatId }, callback) => {
       try {
         const message = await Message.findById(messageId);
         if (!message) return callback?.({ error: 'Message not found' });
         if (message.sender.toString() !== userId) return callback?.({ error: 'Cannot edit others message' });
-
         message.editHistory.push({ content: message.content });
         message.content = content;
         message.isEdited = true;
         await message.save();
-
         io.to(`chat:${chatId}`).emit('message_edited', { messageId, content, chatId, isEdited: true });
         callback?.({ success: true });
       } catch (error) {
@@ -162,22 +106,17 @@ const setupSocket = (io) => {
       }
     });
 
-    // ─────────────────────────────────────────
-    // DELETE MESSAGE
-    // ─────────────────────────────────────────
     socket.on('delete_message', async ({ messageId, chatId }, callback) => {
       try {
         const message = await Message.findById(messageId);
         if (!message) return callback?.({ error: 'Message not found' });
         if (message.sender.toString() !== userId) return callback?.({ error: 'Not authorized' });
-
         if (!message.originalContent) message.originalContent = message.content;
         message.isDeleted = true;
         message.deletedAt = new Date();
         message.deletedBy = userId;
         message.content = 'This message was deleted';
         await message.save();
-
         io.to(`chat:${chatId}`).emit('message_deleted', { messageId, chatId });
         callback?.({ success: true });
       } catch (error) {
@@ -185,18 +124,11 @@ const setupSocket = (io) => {
       }
     });
 
-    // ─────────────────────────────────────────
-    // EMOJI REACTION
-    // ─────────────────────────────────────────
     socket.on('add_reaction', async ({ messageId, emoji, chatId }) => {
       try {
         const message = await Message.findById(messageId);
         if (!message) return;
-
-        // Toggle reaction
-        const idx = message.reactions.findIndex(
-          (r) => r.user.toString() === userId && r.emoji === emoji
-        );
+        const idx = message.reactions.findIndex((r) => r.user.toString() === userId && r.emoji === emoji);
         if (idx >= 0) {
           message.reactions.splice(idx, 1);
         } else {
@@ -204,30 +136,94 @@ const setupSocket = (io) => {
           message.reactions.push({ user: userId, emoji });
         }
         await message.save();
-
-        io.to(`chat:${chatId}`).emit('reaction_updated', {
-          messageId,
-          reactions: message.reactions,
-          chatId,
-        });
+        io.to(`chat:${chatId}`).emit('reaction_updated', { messageId, reactions: message.reactions, chatId });
       } catch (error) {
         console.error('add_reaction error:', error);
       }
     });
 
-    // ─────────────────────────────────────────
-    // JOIN CHAT ROOM
-    // ─────────────────────────────────────────
     socket.on('join_chat', ({ chatId }) => {
       socket.join(`chat:${chatId}`);
     });
 
-    // ─────────────────────────────────────────
-    // DISCONNECT
-    // ─────────────────────────────────────────
-    socket.on('disconnect', async () => {
-      console.log(`🔴 User disconnected: ${userId} (socket: ${socket.id})`);
+    // ─── CALLS (WebRTC Signaling) ─────────────
+    socket.on('call_initiate', async ({ recipientIds, type, chatId, callId, roomId }) => {
+      try {
+        const caller = await User.findById(userId).select('username displayName avatar');
+        recipientIds.forEach((recipientId) => {
+          const recipientSockets = onlineUsers.get(recipientId);
+          if (recipientSockets) {
+            recipientSockets.forEach((socketId) => {
+              io.to(socketId).emit('incoming_call', {
+                callId,
+                roomId,
+                caller,
+                type,
+                chatId,
+              });
+            });
+          }
+        });
+      } catch (error) {
+        console.error('call_initiate error:', error);
+      }
+    });
 
+    socket.on('call_accepted', ({ callId, roomId, callerId }) => {
+      const callerSockets = onlineUsers.get(callerId);
+      if (callerSockets) {
+        callerSockets.forEach((socketId) => {
+          io.to(socketId).emit('call_accepted', { callId, roomId, acceptedBy: userId });
+        });
+      }
+      socket.join(`call:${roomId}`);
+    });
+
+    socket.on('call_rejected', ({ callId, callerId }) => {
+      const callerSockets = onlineUsers.get(callerId);
+      if (callerSockets) {
+        callerSockets.forEach((socketId) => {
+          io.to(socketId).emit('call_rejected', { callId, rejectedBy: userId });
+        });
+      }
+    });
+
+    socket.on('call_ended', ({ roomId }) => {
+      io.to(`call:${roomId}`).emit('call_ended', { roomId });
+      socket.leave(`call:${roomId}`);
+    });
+
+    // WebRTC signaling
+    socket.on('webrtc_offer', ({ offer, roomId, targetUserId }) => {
+      const targetSockets = onlineUsers.get(targetUserId);
+      if (targetSockets) {
+        targetSockets.forEach((socketId) => {
+          io.to(socketId).emit('webrtc_offer', { offer, roomId, fromUserId: userId });
+        });
+      }
+    });
+
+    socket.on('webrtc_answer', ({ answer, roomId, targetUserId }) => {
+      const targetSockets = onlineUsers.get(targetUserId);
+      if (targetSockets) {
+        targetSockets.forEach((socketId) => {
+          io.to(socketId).emit('webrtc_answer', { answer, roomId, fromUserId: userId });
+        });
+      }
+    });
+
+    socket.on('webrtc_ice_candidate', ({ candidate, roomId, targetUserId }) => {
+      const targetSockets = onlineUsers.get(targetUserId);
+      if (targetSockets) {
+        targetSockets.forEach((socketId) => {
+          io.to(socketId).emit('webrtc_ice_candidate', { candidate, roomId, fromUserId: userId });
+        });
+      }
+    });
+
+    // ─── DISCONNECT ───────────────────────────
+    socket.on('disconnect', async () => {
+      console.log(`🔴 User disconnected: ${userId}`);
       if (onlineUsers.has(userId)) {
         onlineUsers.get(userId).delete(socket.id);
         if (onlineUsers.get(userId).size === 0) {

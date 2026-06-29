@@ -15,6 +15,8 @@ const userRoutes = require('./routes/users');
 const chatRoutes = require('./routes/chats');
 const messageRoutes = require('./routes/messages');
 const uploadRoutes = require('./routes/upload');
+const statusRoutes = require('./routes/status');
+const callRoutes = require('./routes/calls');
 
 // Connect to DB
 connectDB();
@@ -24,12 +26,12 @@ const server = http.createServer(app);
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+if (!fs.existsSync(uploadsDir)) if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
 // Socket.io
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || '*',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   },
@@ -39,21 +41,16 @@ const io = new Server(server, {
 setupSocket(io);
 
 // Middleware
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || '*',
-    credentials: true,
-  })
-);
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Static files (uploads)
+// Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: '🔥 MIKE Messenger API is running', timestamp: new Date() });
+  res.json({ status: 'OK', message: '🔥 MIKE Messenger API v2.0 is running', timestamp: new Date() });
 });
 
 // Routes
@@ -62,6 +59,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/status', statusRoutes);
+app.use('/api/calls', callRoutes);
 
 // 404
 app.use((req, res) => {
@@ -86,7 +85,7 @@ server.listen(PORT, () => {
   ██╔██╗ ██║██║██╔═██╗ ██╔══╝  
   ██║╚████╔╝██║██║  ██╗███████╗
   ╚═╝ ╚═══╝ ╚═╝╚═╝  ╚═╝╚══════╝
-  🔥 MIKE Messenger Server
+  🔥 MIKE Messenger Server v2.0
   🚀 Running on port ${PORT}
   🌐 Environment: ${process.env.NODE_ENV || 'development'}
   `);

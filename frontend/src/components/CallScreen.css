@@ -1,0 +1,217 @@
+/* Call Screen */
+.call-screen {
+  position: fixed;
+  inset: 0;
+  background: #111b21;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+}
+
+/* Video */
+.video-container {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.local-video {
+  position: absolute;
+  bottom: 180px;
+  right: 20px;
+  width: 120px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #00a884;
+  z-index: 10;
+}
+
+/* Audio call UI */
+.audio-call-ui {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+.call-avatar-large {
+  filter: drop-shadow(0 0 30px rgba(0,168,132,0.4));
+}
+
+.call-wave {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.call-wave span {
+  width: 4px;
+  background: #00a884;
+  border-radius: 2px;
+  animation: wave 1.2s ease infinite;
+}
+
+.call-wave span:nth-child(1) { height: 20px; animation-delay: 0s; }
+.call-wave span:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+.call-wave span:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+.call-wave span:nth-child(4) { height: 35px; animation-delay: 0.3s; }
+.call-wave span:nth-child(5) { height: 20px; animation-delay: 0.4s; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(1); opacity: 1; }
+  50% { transform: scaleY(0.5); opacity: 0.5; }
+}
+
+/* Call info */
+.call-info {
+  text-align: center;
+  z-index: 10;
+  padding: 20px;
+}
+
+.call-info h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e9edef;
+  margin-bottom: 8px;
+}
+
+.call-status-text {
+  font-size: 16px;
+  color: #8696a0;
+}
+
+.call-status-text.connected { color: #00a884; font-weight: 600; font-size: 20px; }
+.call-status-text.ringing { color: #ffc107; }
+.call-status-text.failed { color: #ff6b6b; }
+
+/* Controls */
+.call-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 20px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.call-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.call-btn span {
+  font-size: 10px;
+  position: absolute;
+  bottom: -20px;
+  white-space: nowrap;
+  color: #8696a0;
+}
+
+.call-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.call-btn.active { background: rgba(255,255,255,0.25); }
+
+.call-btn.end-call {
+  background: #ff4444;
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
+}
+
+.call-btn.end-call:hover { background: #cc0000; }
+
+/* Incoming call */
+.incoming-call-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.incoming-call-card {
+  background: #202c33;
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+.incoming-call-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e9edef;
+  margin: 16px 0 6px;
+}
+
+.incoming-call-card p {
+  font-size: 14px;
+  color: #8696a0;
+  margin-bottom: 24px;
+}
+
+.incoming-call-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.accept-btn, .reject-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.accept-btn { background: #00a884; }
+.accept-btn:hover { background: #008069; transform: scale(1.1); }
+.reject-btn { background: #ff4444; }
+.reject-btn:hover { background: #cc0000; transform: scale(1.1); }
+
+.call-type-badge {
+  background: rgba(0,168,132,0.2);
+  color: #00a884;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.ringing-animation {
+  animation: pulse 1s ease infinite;
+}

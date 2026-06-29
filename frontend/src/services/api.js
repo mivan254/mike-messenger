@@ -7,14 +7,12 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// Attach token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('mike_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle 401 globally
 api.interceptors.response.use(
   (res) => res,
   (error) => {
@@ -75,6 +73,25 @@ export const uploadAPI = {
       onUploadProgress: onProgress,
     });
   },
+};
+
+// ─── Status/Updates ──────────────────────────
+export const statusAPI = {
+  getUpdates: () => api.get('/status'),
+  getMyStatus: () => api.get('/status/my'),
+  createStatus: (data) => api.post('/status', data),
+  viewStatus: (id) => api.post(`/status/${id}/view`),
+  reactToStatus: (id, emoji) => api.post(`/status/${id}/react`, { emoji }),
+  deleteStatus: (id) => api.delete(`/status/${id}`),
+};
+
+// ─── Calls ───────────────────────────────────
+export const callsAPI = {
+  initiateCall: (data) => api.post('/calls/initiate', data),
+  acceptCall: (id) => api.put(`/calls/${id}/accept`),
+  rejectCall: (id) => api.put(`/calls/${id}/reject`),
+  endCall: (id) => api.put(`/calls/${id}/end`),
+  getHistory: () => api.get('/calls/history'),
 };
 
 export default api;
