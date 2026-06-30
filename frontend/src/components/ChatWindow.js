@@ -427,14 +427,26 @@ const ChatWindow = () => {
           📎
         </button>
 
-        <div className="chat-input-wrapper">
+       <div className="chat-input-wrapper">
           <textarea
             ref={inputRef}
             className="chat-input"
             placeholder="Type a message…"
             value={input}
-            onChange={(e) => { setInput(e.target.value); handleTyping(); }}
-            onKeyDown={handleKeyDown}
+            onChange={(e) => {
+              setInput(e.target.value);
+              handleTyping();
+              e.target.style.height = 'auto';
+              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+            }}
+            onKeyDown={(e) => {
+              handleKeyDown(e);
+              if (e.key === 'Enter' && !e.shiftKey) {
+                setTimeout(() => {
+                  if (inputRef.current) inputRef.current.style.height = 'auto';
+                }, 0);
+              }
+            }}
             rows={1}
           />
         </div>

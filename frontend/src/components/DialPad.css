@@ -1,0 +1,290 @@
+.dialpad-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialpad-card {
+  background: var(--bg-secondary);
+  border-radius: 24px;
+  width: 320px;
+  padding: 0 0 24px 0;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: fadeIn 0.2s ease;
+  overflow: hidden;
+}
+
+.dialpad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.dialpad-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dialpad-close {
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialpad-search {
+  padding: 12px 16px;
+}
+
+.dialpad-search input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.dialpad-contacts {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0 8px;
+}
+
+.dialpad-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.dialpad-contact-item:hover { background: var(--bg-hover); }
+
+.dialpad-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dialpad-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dialpad-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--mike-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialpad-contact-info { flex: 1; }
+
+.dialpad-contact-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dialpad-contact-user {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.dialpad-contact-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.dialpad-contact-actions button {
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dialpad-contact-actions button:hover { background: var(--mike-green); }
+
+.no-contacts {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.dialpad-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 24px 8px;
+  min-height: 56px;
+}
+
+.dialpad-number {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: 3px;
+  flex: 1;
+  text-align: center;
+}
+
+.dialpad-placeholder {
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: normal;
+}
+
+.dialpad-backspace {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.dialpad-grid {
+  padding: 8px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialpad-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.dialpad-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  gap: 2px;
+}
+
+.dialpad-btn:hover {
+  background: var(--bg-hover);
+  transform: scale(1.05);
+}
+
+.dialpad-btn:active {
+  background: var(--mike-green);
+  transform: scale(0.95);
+}
+
+.dialpad-btn-main {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.dialpad-btn-sub {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.dialpad-call-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px 24px 0;
+}
+
+.dialpad-call-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #00a884;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(0,168,132,0.4);
+}
+
+.dialpad-call-btn:hover { background: #008069; transform: scale(1.05); }
+.dialpad-call-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.dialpad-call-btn.calling { animation: pulse 0.8s infinite; }
+
+.dialpad-video-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.dialpad-video-btn:hover { background: #2196f3; }
+.dialpad-video-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dialpad-end-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: none;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.dialpad-end-btn:hover { background: #ff4444; color: #fff; }

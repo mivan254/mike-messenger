@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ChatProvider } from './contexts/ChatContext';
+import { ChatProvider, useChat } from './contexts/ChatContext';
 import { SocketProvider } from './contexts/SocketContext';
 import Sidebar from './components/Sidebar';
 import ChatWindow from './components/ChatWindow';
@@ -20,15 +20,28 @@ const TABS = [
 
 const AppShell = () => {
   const { user } = useAuth();
+  const { activeChat } = useChat();
   const [activeTab, setActiveTab]       = useState('chats');
-  const [activeChat, setActiveChat]     = useState(null);
+  const [allContacts, setAllContacts]   = useState([]);
   const [incomingCall, setIncomingCall] = useState(null);
   const [activeCall, setActiveCall]     = useState(null);
+useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const { usersAPI } = require('./services/api');
+        const res = await usersAPI.search('a');
+        setAllContacts(res.data.users || []);
+      } catch (err) {
+        console.error('Failed to load contacts:', err);
+      }
+    };
+    fetchContacts();
+  }, []);
 
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
-    socket.on('incoming_call', (data) => setIncomingCall(data));
+    socket.on('incoming_call', (data) => setIncomingCall(data)); 
     socket.on('call_accepted', ({ callId, roomId }) => {
       setActiveCall((prev) =>
         prev && prev._id === callId ? { ...prev, status: 'active', roomId } : prev
@@ -90,10 +103,10 @@ const AppShell = () => {
         </div>
         <div className="tab-content">
           {activeTab === 'chats' && (
-            <Sidebar activeChat={activeChat} onSelectChat={setActiveChat} />
+            <Sidebar />
           )}
-          {activeTab === 'calls' && (
-            <Calls onStartCall={handleStartCall} />
+         {activeTab === 'calls' && (
+            <Calls onStartCall={handleStartCall} contacts={allContacts} />
           )}
           {activeTab === 'updates' && (
             <Updates />
@@ -104,8 +117,6 @@ const AppShell = () => {
       <div className="right-panel">
         {activeChat ? (
           <ChatWindow
-            chat={activeChat}
-            currentUser={user}
             onStartCall={handleStartCall}
           />
         ) : (

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { callsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import './Calls.css';
+import DialPad from './DialPad';
 
-const Calls = ({ onStartCall }) => {
+const Calls = ({ onStartCall, contacts = [] }) => {
   const { user } = useAuth();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [showDialPad, setShowDialPad] = useState(false);
   useEffect(() => {
     callsAPI.getHistory()
       .then(res => setHistory(res.data.calls))
@@ -51,10 +52,10 @@ const Calls = ({ onStartCall }) => {
         <h2>Calls</h2>
         <button
           className="icon-btn"
-          onClick={() => onStartCall && onStartCall()}
-          title="New call"
+          onClick={() => setShowDialPad(true)}
+          title="Dial pad"
         >
-          📞
+          🔢
         </button>
       </div>
 
@@ -121,6 +122,14 @@ const Calls = ({ onStartCall }) => {
           </div>
         );
       })}
+
+      {showDialPad && (
+        <DialPad
+          onClose={() => setShowDialPad(false)}
+          onStartCall={onStartCall}
+          contacts={contacts}
+        />
+      )}
     </div>
   );
 };
